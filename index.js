@@ -1,7 +1,7 @@
 const TelegramBot = require('node-telegram-bot-api');
 const axios = require('axios');
 
-// Bot start
+// Bot initialization
 const bot = new TelegramBot(process.env.BOT_TOKEN, { polling: true });
 
 // API Keys
@@ -25,7 +25,7 @@ bot.on('message', async (msg) => {
 
     const text = msg.text.toLowerCase();
 
-    // 1️⃣ Creator question → Highest priority
+    // 1️⃣ Creator priority
     if (text.includes("kar dara toiri") || text.includes("apni kar")) {
         return bot.sendMessage(chatId, "আমি Talha দ্বারা তৈরি 🤖");
     }
@@ -36,7 +36,8 @@ bot.on('message', async (msg) => {
             const url = `http://api.wolframalpha.com/v1/result?i=${encodeURIComponent(text)}&appid=${WOLFRAM_APP_ID}`;
             const res = await axios.get(url);
             return bot.sendMessage(chatId, res.data);
-        } catch {
+        } catch (err) {
+            console.error(err);
             return bot.sendMessage(chatId, "Math সমাধান পাওয়া যায়নি।");
         }
     }
@@ -45,7 +46,8 @@ bot.on('message', async (msg) => {
     try {
         const aiReply = await askGemini(text);
         bot.sendMessage(chatId, aiReply);
-    } catch {
+    } catch (err) {
+        console.error(err);
         bot.sendMessage(chatId, "AI সাময়িকভাবে কাজ করছে না।");
     }
 });
